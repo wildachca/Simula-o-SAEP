@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+<body onload="carregarTarefas()">
+
+<div class="navbar">
+    <div>Gerenciamento de Tarefas</div>
+    <div>
+        <a href="usuarios.html">Cadastro de Usuários</a>
+        <a href="tarefas.html">Cadastro de Tarefas</a>
+        <a href="index.html">Gerenciar Tarefas</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="kanban">
+        <div class="coluna">
+            <h3>A Fazer</h3>
+            <div id="AFazer"></div>
+        </div>
+
+        <div class="coluna">
+            <h3>Fazendo</h3>
+            <div id="Fazendo"></div>
+        </div>
+
+        <div class="coluna">
+            <h3>Pronto</h3>
+            <div id="Pronto"></div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Cadastro de Tarefas</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body onload="carregarUsuarios()">
+
+<h2>Cadastro de Tarefa</h2>
+
+<input id="descricao" placeholder="Descrição"><br><br>
+<input id="setor" placeholder="Setor"><br><br>
+
+<select id="usuario"></select><br><br>
+
+<select id="prioridade">
+    <option value="">Selecione prioridade</option>
+    <option>Baixa</option>
+    <option>Média</option>
+    <option>Alta</option>
+</select><br><br>
+
+<button onclick="cadastrarTarefa()">Cadastrar</button>
+
+<div id="mensagem" class="msg"></div>
+
+<script>
+const API = "http://localhost:3000";
+
+async function carregarUsuarios() {
+    const res = await fetch(API + "/usuarios");
+    const usuarios = await res.json();
+
+    const select = document.getElementById("usuario");
+    select.innerHTML = "<option value=''>Selecione usuário</option>";
+
+    usuarios.forEach(u => {
+        select.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
+    });
+}
+
+async function cadastrarTarefa() {
+    const descricao = document.getElementById("descricao").value;
+    const setor = document.getElementById("setor").value;
+    const usuario = document.getElementById("usuario").value;
+    const prioridade = document.getElementById("prioridade").value;
+    const msg = document.getElementById("mensagem");
+
+    if (!descricao || !setor || !usuario || !prioridade) {
+        msg.innerText = "Preencha todos os campos!";
+        return;
+    }
+
+    await fetch(API + "/tarefas", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+            descricao,
+            setor,
+            id_usuario: usuario,
+            prioridade
+        })
+    });
+
+    msg.innerText = "Tarefa cadastrada com sucesso!";
+}
+</script>
+
+</body>
+</html>
