@@ -1,14 +1,14 @@
 const API = "http://localhost:3000";
 
 function msg(texto) {
-    document.getElementById("mensagem").innerText = texto;
+    const el = document.getElementById("mensagem");
+    if (el) el.innerText = texto;
 }
 
-// ================= USUÁRIOS =================
-
+// ================= USUÁRIO =================
 async function cadastrarUsuario() {
-    const nome = nomeInput.value;
-    const email = emailInput.value;
+    const nome = document.getElementById("nomeInput").value;
+    const email = document.getElementById("emailInput").value;
 
     if (!nome || !email) return msg("Preencha tudo");
 
@@ -19,14 +19,12 @@ async function cadastrarUsuario() {
     });
 
     const data = await res.json();
-
     if (data.erro) return msg(data.erro);
 
     msg("Usuário cadastrado!");
 }
 
-// ================= TAREFAS =================
-
+// ================= TAREFA =================
 async function carregarUsuarios() {
     const res = await fetch(API + "/usuarios");
     const usuarios = await res.json();
@@ -35,7 +33,6 @@ async function carregarUsuarios() {
     if (!select) return;
 
     select.innerHTML = "<option value=''>Selecione</option>";
-
     usuarios.forEach(u => {
         select.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
     });
@@ -55,16 +52,16 @@ function initTarefa() {
 }
 
 async function cadastrarTarefa() {
-    const descricao = descricao.value;
-    const setor = setor.value;
-    const usuario = usuario.value;
-    const prioridade = prioridade.value;
+    const descricao = document.getElementById("descricao").value;
+    const setor = document.getElementById("setor").value;
+    const usuario = document.getElementById("usuario").value;
+    const prioridade = document.getElementById("prioridade").value;
 
     if (!descricao || !setor || !usuario || !prioridade) {
         return msg("Preencha tudo");
     }
 
-    await fetch(API + "/tarefas", {
+    const res = await fetch(API + "/tarefas", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({
@@ -75,6 +72,9 @@ async function cadastrarTarefa() {
         })
     });
 
+    const data = await res.json();
+    if (data.erro) return msg(data.erro);
+
     msg("Tarefa criada!");
 }
 
@@ -84,33 +84,34 @@ async function carregarTarefa(id) {
 
     const t = tarefas.find(t => t.id == id);
 
-    descricao.value = t.descricao;
-    setor.value = t.setor;
-    usuario.value = t.id_usuario;
-    prioridade.value = t.prioridade;
+    document.getElementById("descricao").value = t.descricao;
+    document.getElementById("setor").value = t.setor;
+    document.getElementById("usuario").value = t.id_usuario;
+    document.getElementById("prioridade").value = t.prioridade;
 
-    document.getElementById("titulo").innerText = "Editar Tarefa";
+    document.getElementById("titulo").innerText = "Editar";
     document.getElementById("botao").innerText = "Atualizar";
-
     document.getElementById("botao").onclick = () => atualizarTarefa(id);
 }
 
 async function atualizarTarefa(id) {
-    await fetch(API + `/tarefas/${id}`, {
+    const res = await fetch(API + `/tarefas/${id}`, {
         method: "PUT",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({
-            descricao: descricao.value,
-            setor: setor.value,
-            prioridade: prioridade.value
+            descricao: document.getElementById("descricao").value,
+            setor: document.getElementById("setor").value,
+            prioridade: document.getElementById("prioridade").value
         })
     });
+
+    const data = await res.json();
+    if (data.erro) return msg(data.erro);
 
     window.location.href = "index.html";
 }
 
 // ================= KANBAN =================
-
 async function carregarTarefas() {
     const res = await fetch(API + "/tarefas");
     const tarefas = await res.json();
@@ -124,21 +125,20 @@ async function carregarTarefas() {
         card.className = "card";
 
         card.innerHTML = `
-        <b>${t.descricao}</b><br>
-        ${t.setor}<br>
-        ${t.prioridade}<br>
-        ${t.usuario}<br><br>
+            ${t.descricao}<br>
+            ${t.setor}<br>
+            ${t.prioridade}<br>
+            ${t.usuario}<br><br>
 
-        <button onclick="mudarStatus(${t.id}, 'a fazer')">A Fazer</button>
-        <button onclick="mudarStatus(${t.id}, 'fazendo')">Fazendo</button>
-        <button onclick="mudarStatus(${t.id}, 'pronto')">Pronto</button><br><br>
+            <button onclick="mudarStatus(${t.id}, 'a fazer')">A Fazer</button>
+            <button onclick="mudarStatus(${t.id}, 'fazendo')">Fazendo</button>
+            <button onclick="mudarStatus(${t.id}, 'pronto')">Pronto</button><br><br>
 
-        <button onclick="editar(${t.id})">Editar</button>
-        <button onclick="deletar(${t.id})">Excluir</button>
+            <button onclick="editar(${t.id})">Editar</button>
+            <button onclick="deletar(${t.id})">Excluir</button>
         `;
 
-        const coluna = t.status.replace(" ", "");
-        document.getElementById(coluna).appendChild(card);
+        document.getElementById(t.status.replace(" ", "")).appendChild(card);
     });
 }
 
@@ -159,9 +159,6 @@ async function mudarStatus(id, status) {
 async function deletar(id) {
     if (!confirm("Tem certeza?")) return;
 
-    await fetch(API + `/tarefas/${id}`, {
-        method: "DELETE"
-    });
-
+    await fetch(API + `/tarefas/${id}`, { method: "DELETE" });
     carregarTarefas();
 }
